@@ -1,7 +1,7 @@
 ---
 name: 기능 구현 (feat)
 about: 새로운 기능 구현
-title: ''
+title: "[Feat]"
 labels: feat
 assignees: kosy00
 
