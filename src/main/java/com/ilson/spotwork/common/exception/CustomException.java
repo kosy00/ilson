@@ -2,13 +2,15 @@ package com.ilson.spotwork.common.exception;
 
 import lombok.Getter;
 
+import java.util.Objects;
+
 @Getter
 public class CustomException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
     public CustomException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
+        super(Objects.requireNonNull(errorCode, "errorCode must not be null").getMessage());
         this.errorCode = errorCode;
     }
 }
