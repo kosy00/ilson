@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -31,8 +33,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column
-    private String avgRating;
+    @Column(precision = 3, scale = 1)
+    private BigDecimal avgRating;
 
     @Column(nullable = false)
     private boolean locked = false;
