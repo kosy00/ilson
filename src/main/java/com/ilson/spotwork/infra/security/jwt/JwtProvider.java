@@ -32,8 +32,6 @@ public class JwtProvider {
     @Value("${jwt.refresh-token-expiration}")
     private long refreshTokenExpiration;
 
-    private SecretKey signingKey;
-
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
@@ -99,11 +97,9 @@ public class JwtProvider {
      public Authentication getAuthentication(String token) {
         Long userId = getUserId(token);
         Role role = getRole(token);
-         UserDetails userDetails = User.builder()
-                 .username(String.valueOf(userId))
-                 .password("")
-                 .roles(role.name())
-                 .build();
+
+        CustomUserDetails userDetails = new CustomUserDetails(userId, role);
+
          return new UsernamePasswordAuthenticationToken(
                  userDetails, null, userDetails.getAuthorities());
 
