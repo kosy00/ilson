@@ -27,7 +27,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**",
+                                "/api/auth/signup",
+                                "/api/auth/login",
+                                "/api/auth/reissue",
                                 "/api/jobs",
                                 "/api/jobs/{jobId}",
                                 "/api/jobs/search",

@@ -2,9 +2,7 @@ package com.ilson.spotwork.domain.user.entity;
 
 import com.ilson.spotwork.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -12,13 +10,15 @@ import java.math.BigDecimal;
 @Table(name = "users")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class User extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    private String nickName;
+    private String nickname;
 
     @Column(nullable = false)
     private String password;
