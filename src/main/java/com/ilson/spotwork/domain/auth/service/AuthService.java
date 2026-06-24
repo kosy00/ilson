@@ -42,7 +42,7 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
-        log.info("[Auth] 회원가입 완료 email = {}", request.getEmail());
+        log.info("[Auth] 회원가입 완료");
     }
 
     // 로그인
@@ -68,7 +68,7 @@ public class AuthService {
 
         refreshTokenRepository.save(user.getId(), refreshToken);
 
-        log.info("[Auth] 로그인 완료 email = {}", request.getEmail());
+        log.info("[Auth] 로그인 완료 userId = {}", user.getId());
 
         return TokenResponseDto.builder()
                 .accessToken(accessToken)
@@ -83,10 +83,8 @@ public class AuthService {
         jwtProvider.validateToken(refreshToken);
         Long userId = jwtProvider.getUserId(refreshToken);
 
-        //Redis에 저장된 토큰과 비교
-        String storedToken = refreshTokenRepository.find(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
-        if (!storedToken.equals(refreshToken)) {
+        // 저장된 토큰과 비교 후 즉시 삭제 (원자적 처리로 동시 재발급 방지)
+        if (!refreshTokenRepository.compareAndDelete(userId, refreshToken)) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
