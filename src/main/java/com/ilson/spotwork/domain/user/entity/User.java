@@ -38,4 +38,9 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private boolean locked = false;
+
+    public void updateInfo(String nickname, String phone) {
+        if (nickname != null) this.nickname = nickname;
+        if (phone != null) this.phone = phone;
+    }
 }
