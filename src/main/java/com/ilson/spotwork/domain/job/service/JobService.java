@@ -12,8 +12,8 @@ import com.ilson.spotwork.domain.user.entity.User;
 import com.ilson.spotwork.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,12 +54,13 @@ public class JobService {
 
     // 공고 목록 조회
     @Transactional(readOnly = true)
-    public Page<JobResponseDto> getList(Pageable pageable) {
+    public Slice<JobResponseDto> getList(Pageable pageable) {
         return jobRepository.findByStatus(JobStatus.OPEN, pageable)
                 .map(JobResponseDto::from);
     }
 
     //공고 상세 조회
+    @Transactional(readOnly = true)
     public JobResponseDto getDetail(Long jobId) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new CustomException(ErrorCode.JOB_NOT_FOUND));
@@ -99,14 +100,14 @@ public class JobService {
 
     // 내 공고 목록 조회
     @Transactional(readOnly = true)
-    public Page<JobResponseDto> getMyJobs(Long userId, Pageable pageable) {
+    public Slice<JobResponseDto> getMyJobs(Long userId, Pageable pageable) {
         return jobRepository.findByEmployerId(userId, pageable)
                 .map(JobResponseDto::from);
     }
 
     // 공고 삭제
     public void delete(Long userId, Long jobId) {
-        Job job = jobRepository.findById(userId)
+        Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new CustomException(ErrorCode.JOB_NOT_FOUND));
 
         if (!job.getEmployer().getId().equals(userId)) {
