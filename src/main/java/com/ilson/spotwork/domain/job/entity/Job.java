@@ -60,9 +60,15 @@ public class Job extends BaseEntity {
         this.status = JobStatus.CLOSED;
     }
 
-    public void updateInfo(String title, String description, int hourlyWage) {
+    public void updateInfo(String title, String description, int hourlyWage, LocalDate workDate, LocalTime startTime, LocalTime endTime, int headcount, String address) {
         this.title = title;
         this.description = description;
         this.hourlyWage = hourlyWage;
+        this.workDate = workDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.headcount = headcount;
+        this.address = address;
+
     }
 }
