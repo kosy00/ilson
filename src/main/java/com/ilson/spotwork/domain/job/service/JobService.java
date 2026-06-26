@@ -79,7 +79,7 @@ public class JobService {
 
         // OPEN 상태인 공고만 수정 가능
         if (!job.getStatus().equals(JobStatus.OPEN)) {
-            throw new CustomException(ErrorCode.INVALID_INPUT);
+            throw new CustomException(ErrorCode.JOB_CLOSED);
         }
 
         job.updateInfo(
