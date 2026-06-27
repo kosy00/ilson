@@ -7,6 +7,8 @@ import com.ilson.spotwork.domain.job.dto.JobUpdateRequestDto;
 import com.ilson.spotwork.domain.job.service.JobService;
 import com.ilson.spotwork.infra.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +16,10 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/jobs")
 @RequiredArgsConstructor
@@ -36,8 +40,8 @@ public class JobController {
     // 공고 목록 조회
     @GetMapping
     public ApiResponse<Slice<JobResponseDto>> getList(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Positive int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Slice<JobResponseDto> response = jobService.getList(pageable);
         return ApiResponse.success(response);
@@ -72,8 +76,8 @@ public class JobController {
     @GetMapping("/me")
     public ApiResponse<Slice<JobResponseDto>> getMyJobs(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Positive int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return ApiResponse.success(jobService.getMyJobs(userDetails.getUserId(), pageable));
     }
