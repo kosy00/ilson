@@ -8,6 +8,7 @@ import com.ilson.spotwork.domain.job.dto.JobUpdateRequestDto;
 import com.ilson.spotwork.domain.job.entity.Job;
 import com.ilson.spotwork.domain.job.entity.JobStatus;
 import com.ilson.spotwork.domain.job.repository.JobRepository;
+import com.ilson.spotwork.domain.user.entity.Role;
 import com.ilson.spotwork.domain.user.entity.User;
 import com.ilson.spotwork.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,10 @@ public class JobService {
     public JobResponseDto register(Long userId, JobCreateRequestDto request) {
         User employer = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (employer.getRole() != Role.EMPLOYER) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         Job job =Job.builder()
                 .title(request.getTitle())
@@ -90,7 +95,9 @@ public class JobService {
                 request.getStartTime(),
                 request.getEndTime(),
                 request.getHeadcount(),
-                request.getAddress()
+                request.getAddress(),
+                request.getLatitude(),
+                request.getLongitude()
         );
 
         Job saved = jobRepository.save(job);

@@ -60,7 +60,7 @@ public class Job extends BaseEntity {
         this.status = JobStatus.CLOSED;
     }
 
-    public void updateInfo(String title, String description, int hourlyWage, LocalDate workDate, LocalTime startTime, LocalTime endTime, int headcount, String address) {
+    public void updateInfo(String title, String description, int hourlyWage, LocalDate workDate, LocalTime startTime, LocalTime endTime, int headcount, String address, double latitude, double longitude) {
         this.title = title;
         this.description = description;
         this.hourlyWage = hourlyWage;
@@ -69,6 +69,7 @@ public class Job extends BaseEntity {
         this.endTime = endTime;
         this.headcount = headcount;
         this.address = address;
-
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }
