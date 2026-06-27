@@ -46,3 +46,6 @@ logs/
 ### Local config ###
 application-local.yml
 .env
+
+# 정적 리소스
+src/main/resources/static/

@@ -1,6 +1,7 @@
 package com.ilson.spotwork.common.exception;
 
 import com.ilson.spotwork.common.response.ApiResponse;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -24,10 +25,7 @@ public class GlobalExceptionHandler {
         log.error("CustomException: {}", errorCode.getMessage());
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
-                .body(ApiResponse.error(
-                        errorCode.getHttpStatus().value(),
-                        errorCode.getMessage()
-                ));
+                .body(ApiResponse.error(errorCode.getMessage()));
     }
 
     // 이메일 확인 동시 요청으로 인한 DB 유니크 제약 위반 처리
@@ -36,10 +34,7 @@ public class GlobalExceptionHandler {
         log.error("DataIntegrityViolationException: {}", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(
-                        ErrorCode.DUPLICATE_EMAIL.getHttpStatus().value(),
-                        ErrorCode.DUPLICATE_EMAIL.getMessage()
-                ));
+                .body(ApiResponse.error(ErrorCode.DUPLICATE_EMAIL.getMessage()));
     }
 
     // Validation 에러 처리
@@ -53,7 +48,16 @@ public class GlobalExceptionHandler {
         log.error("ValidationException: {}", errors);
         return ResponseEntity
                 .badRequest()
-                .body(ApiResponse.error(400, "입력값이 올바르지 않습니다.", errors));
+                .body(ApiResponse.error("입력값이 올바르지 않습니다.", errors));
+    }
+
+    // @Validated 파라미터 검증 실패 처리
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleConstraintViolation(ConstraintViolationException e) {
+        log.error("ConstraintViolationException: {}", e.getMessage());
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.error("입력값이 올바르지 않습니다."));
     }
 
     // 전체 예외 처리 (fallback)
@@ -62,6 +66,6 @@ public class GlobalExceptionHandler {
         log.error("Unexpected Exception: {}", e.getMessage());
         return ResponseEntity
                 .internalServerError()
-                .body(ApiResponse.error(500, "서버 오류가 발생했습니다."));
+                .body(ApiResponse.error("서버 오류가 발생했습니다."));
     }
 }

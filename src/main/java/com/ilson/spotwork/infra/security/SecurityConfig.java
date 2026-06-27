@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -35,21 +36,13 @@ public class SecurityConfig {
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write(
                                     objectMapper.writeValueAsString(
-                                            ApiResponse.error(401, "인증이 필요합니다.")));
+                                            ApiResponse.error("인증이 필요합니다.")));
                         })
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/signup",
-                                "/api/auth/login",
-                                "/api/auth/reissue",
-                                "/api/jobs",
-                                "/api/jobs/{jobId}",
-                                "/api/jobs/search",
-                                "/api/jobs/nearby",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**"
-                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/jobs", "/api/jobs/search", "/api/jobs/nearby").permitAll()
+                        .requestMatchers("/api/auth/signup", "/api/auth/login", "/api/auth/reissue").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
