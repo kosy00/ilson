@@ -10,6 +10,7 @@ import com.ilson.spotwork.domain.job.entity.JobCategory;
 import com.ilson.spotwork.domain.job.service.JobService;
 import com.ilson.spotwork.infra.security.jwt.CustomUserDetails;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -44,14 +45,14 @@ public class JobController {
     }
 
     // 공고 목록 조회 (검색/필터)
-    @GetMapping
+    @GetMapping("/search")
     public ApiResponse<Page<JobSummaryResponse>> search(
             @RequestParam(required = false) JobCategory category,
             @RequestParam(required = false) java.time.LocalDate workDate,
             @RequestParam(required = false) Integer minWage,
             @RequestParam(required = false) Integer maxWage,
             @RequestParam(defaultValue = "0") @Min(0) int page,
-            @RequestParam(defaultValue = "10") @Positive int size) {
+            @RequestParam(defaultValue = "10") @Positive @Max(100) int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         JobSearchCondition cond = new JobSearchCondition(category, workDate, minWage, maxWage);
         return ApiResponse.success(jobService.search(cond, pageable));
