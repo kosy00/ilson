@@ -33,6 +33,7 @@ public class JobQueryRepositoryImpl implements JobQueryRepository {
                         eqWorkDate(condition.getWorkDate()),
                         betweenWage(condition.getMinWage(), condition.getMaxWage())
                 )
+                .orderBy(job.createdAt.desc(), job.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch()
