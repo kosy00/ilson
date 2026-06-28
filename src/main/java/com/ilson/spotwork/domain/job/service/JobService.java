@@ -129,7 +129,10 @@ public class JobService {
     // 공고 목록 조회 (검색/필터링)
     @Transactional(readOnly = true)
     public Page<JobSummaryResponse> search(JobSearchCondition cond, Pageable pageable) {
-        if (cond.getMinWage() != null && cond.getMaxWage() != null && cond.getMinWage() > cond.getMaxWage()) {
+        if ((cond.getMinWage() != null && cond.getMinWage() < 0)
+                || (cond.getMaxWage() != null && cond.getMaxWage() < 0)
+                || (cond.getMinWage() != null && cond.getMaxWage() != null)
+                && cond.getMinWage() > cond.getMaxWage()) {
             throw new CustomException(ErrorCode.INVALID_INPUT);
         }
         return jobRepository.search(cond, pageable);
