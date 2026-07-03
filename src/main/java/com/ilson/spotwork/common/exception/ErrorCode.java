@@ -33,6 +33,7 @@ public enum ErrorCode {
     DUPLICATE_APPLICATION(HttpStatus.CONFLICT, "이미 지원한 공고입니다."),
     INVALID_STATUS_TRANSITION(HttpStatus.BAD_REQUEST, "유효하지 않은 상태 전이입니다."),
     OPTIMISTIC_LOCK_CONFLICT(HttpStatus.CONFLICT, "동시 요청으로 인한 충돌입니다. 다시 시도해주세요."),
+    INVALID_APPLICATION_STATUS(HttpStatus.BAD_REQUEST,"유효하지 않은 지원 상태 전이입니다."),
 
     // Review
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 후기입니다."),
