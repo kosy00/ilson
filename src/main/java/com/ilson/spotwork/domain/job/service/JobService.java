@@ -2,9 +2,7 @@ package com.ilson.spotwork.domain.job.service;
 
 import com.ilson.spotwork.common.exception.CustomException;
 import com.ilson.spotwork.common.exception.ErrorCode;
-import com.ilson.spotwork.domain.job.dto.JobCreateRequestDto;
-import com.ilson.spotwork.domain.job.dto.JobResponseDto;
-import com.ilson.spotwork.domain.job.dto.JobUpdateRequestDto;
+import com.ilson.spotwork.domain.job.dto.*;
 import com.ilson.spotwork.domain.job.entity.Job;
 import com.ilson.spotwork.domain.job.entity.JobStatus;
 import com.ilson.spotwork.domain.job.repository.JobRepository;
@@ -13,6 +11,7 @@ import com.ilson.spotwork.domain.user.entity.User;
 import com.ilson.spotwork.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -21,13 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class JobService {
 
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
 
     // 공고 등록
+    @Transactional
     public JobResponseDto register(Long userId, JobCreateRequestDto request) {
         User employer = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -36,7 +36,7 @@ public class JobService {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
-        Job job =Job.builder()
+        Job job = Job.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .category(request.getCategory())
@@ -51,21 +51,12 @@ public class JobService {
                 .status(JobStatus.OPEN)
                 .employer(employer)
                 .build();
-
         Job saved = jobRepository.save(job);
-        log.info("[Job] 공고 등록 완료 jobId = {}", job.getId());
+        log.info("[Job] 공고 등록 완료 jobId = {}", saved.getId());
         return JobResponseDto.from(saved);
     }
 
-    // 공고 목록 조회
-    @Transactional(readOnly = true)
-    public Slice<JobResponseDto> getList(Pageable pageable) {
-        return jobRepository.findByStatus(JobStatus.OPEN, pageable)
-                .map(JobResponseDto::from);
-    }
-
     //공고 상세 조회
-    @Transactional(readOnly = true)
     public JobResponseDto getDetail(Long jobId) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new CustomException(ErrorCode.JOB_NOT_FOUND));
@@ -73,6 +64,7 @@ public class JobService {
     }
 
     //공고 수정
+    @Transactional
     public JobResponseDto update(Long userId, Long jobId, JobUpdateRequestDto request) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new CustomException(ErrorCode.JOB_NOT_FOUND));
@@ -106,13 +98,13 @@ public class JobService {
     }
 
     // 내 공고 목록 조회
-    @Transactional(readOnly = true)
     public Slice<JobResponseDto> getMyJobs(Long userId, Pageable pageable) {
         return jobRepository.findByEmployerId(userId, pageable)
                 .map(JobResponseDto::from);
     }
 
     // 공고 삭제
+    @Transactional
     public void delete(Long userId, Long jobId) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new CustomException(ErrorCode.JOB_NOT_FOUND));
@@ -126,10 +118,23 @@ public class JobService {
     }
 
     // 공고 마감(스케쥴러에서 호출)
+    @Transactional
     public void closeJob(Long jobId) {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new CustomException(ErrorCode.JOB_NOT_FOUND));
         job.close();
         log.info("[Job] 공고 마감 처리됨 jobId = {}", jobId);
+    }
+
+    // 공고 목록 조회 (검색/필터링)
+    @Transactional(readOnly = true)
+    public Page<JobSummaryResponse> search(JobSearchCondition cond, Pageable pageable) {
+        if ((cond.getMinWage() != null && cond.getMinWage() < 0)
+                || (cond.getMaxWage() != null && cond.getMaxWage() < 0)
+                || (cond.getMinWage() != null && cond.getMaxWage() != null)
+                && cond.getMinWage() > cond.getMaxWage()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
+        return jobRepository.search(cond, pageable);
     }
 }

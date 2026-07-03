@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface JobRepository extends JpaRepository<Job, Long> {
+public interface JobRepository extends JpaRepository<Job, Long>, JobQueryRepository {
     // 공고 목록 (OPEN 상태만)
     Slice<Job> findByStatus(JobStatus status, Pageable pageable);
 
