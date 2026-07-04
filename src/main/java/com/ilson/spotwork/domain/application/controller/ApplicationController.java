@@ -42,6 +42,15 @@ public class ApplicationController {
         return ApiResponse.success(applicationService.accept(userDetails.getUserId(), applicationId));
     }
 
+    @Operation(summary = "지원 거절 (EMPLOYER)")
+    @PatchMapping("/{applicationId}/reject")
+    @PreAuthorize("hasRole('EMPLOYER')")
+    public ApiResponse<ApplicationResponse> reject(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long applicationId) {
+        return ApiResponse.success(applicationService.reject(userDetails.getUserId(), applicationId));
+    }
+
     @Operation(summary = "근무 완료 처리 (EMPLOYER)")
     @PatchMapping("/{applicationId}/complete")
     @PreAuthorize("hasRole('EMPLOYER')")
