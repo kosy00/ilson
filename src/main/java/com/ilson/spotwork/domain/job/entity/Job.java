@@ -1,6 +1,8 @@
 package com.ilson.spotwork.domain.job.entity;
 
 import com.ilson.spotwork.common.entity.BaseEntity;
+import com.ilson.spotwork.common.exception.CustomException;
+import com.ilson.spotwork.common.exception.ErrorCode;
 import com.ilson.spotwork.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -55,6 +57,19 @@ public class Job extends BaseEntity {
     private double latitude; // 위도
     @Column(nullable = false)
     private double longitude; // 경도
+
+    @Version
+    private Long version;
+
+    @Column(nullable = false)
+    private int acceptedCount = 0;
+
+    public void increaseAcceptedCount() {
+        if (this.acceptedCount >= this.headcount) {
+            throw new CustomException(ErrorCode.JOB_CLOSED);
+        }
+        this.acceptedCount++;
+    }
 
     public void close() {
         this.status = JobStatus.CLOSED;
